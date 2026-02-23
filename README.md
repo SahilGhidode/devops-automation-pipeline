@@ -86,7 +86,7 @@ devops-automation-pipeline/
 
 ---
 
-## ▶️ How to Run the Terraform
+## ▶️ How to Run  Terraform
 ```bash
 cd terraform
 terraform init
