@@ -173,7 +173,9 @@ Website becomes unavailable
 1️⃣ Start EC2 instance (AWS Console)
 
 Note new public IP (IP may change)
-
+ cp /mnt/c/Users/HP/Documents/devops-automation-pipeline.pem ~/.ssh/
+ chmod 400 ~/.ssh/devops-automation-pipeline.pem
+  ssh -i ~/.ssh/devops-automation-pipeline.pem ubuntu@13.233.214.47
 2️⃣ SSH into EC2
 ssh -i devops-automation-pipeline.pem ubuntu@<NEW_PUBLIC_IP>
 3️⃣ Start Docker service (if not running)
