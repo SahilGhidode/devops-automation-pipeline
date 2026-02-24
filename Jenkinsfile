@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "instantprachi/devops-automation-pipeline"
+        IMAGE_NAME = "sahilghidode/devops-automation-pipeline"
         IMAGE_TAG  = "latest"
         DOCKER_CREDS = credentials('dockerhub-creds')
     }
