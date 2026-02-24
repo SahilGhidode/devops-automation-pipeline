@@ -210,5 +210,5 @@ Monitoring using Prometheus & Grafana
 
 👨‍💻 Author
 
-Sahil Ghidode
+By Sahil Ghidode
 DevOps | Cloud | Automation
