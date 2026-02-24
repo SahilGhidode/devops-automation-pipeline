@@ -1,216 +1,176 @@
-# 🚀 DevOps Automation Pipeline (CI/CD on AWS)
+# 🚀 DevOps Automation Pipeline
 
-This project demonstrates a complete **DevOps automation pipeline** using modern DevOps tools.  
-It covers **infrastructure provisioning, configuration management, containerization, CI, and deployment** on AWS EC2.
+An end-to-end **DevOps CI/CD Automation Project** that demonstrates how to provision infrastructure, build Docker images, and deploy applications automatically on AWS using **Terraform, Ansible, Jenkins, Docker, Docker Compose, Watchtower, and GitHub Webhooks**.
 
 ---
 
 ## 📌 Project Overview
 
-The goal of this project is to automate the complete lifecycle of an application:
+This project automates the complete lifecycle of a containerized web application:
 
-- Provision infrastructure using **Terraform**
-- Configure servers using **Ansible**
-- Containerize the application using **Docker**
-- Automate build and image push using **Jenkins**
-- Integrate **GitHub Webhooks** for CI
-- Deploy the application on **AWS EC2**
-- Serve the application using **Nginx**
-
----
-
-## 🛠️ Tools & Technologies Used
-
-- **AWS EC2** – Cloud compute
-- **Terraform** – Infrastructure as Code (IaC)
-- **Ansible** – Configuration Management
-- **Docker** – Containerization
-- **Docker Hub** – Image registry
-- **Jenkins** – CI/CD automation
-- **GitHub** – Source code management
-- **Nginx** – Web server
+- Infrastructure provisioning on AWS using Terraform
+- Configuration management with Ansible
+- CI/CD pipeline using Jenkins
+- Docker image build and push to Docker Hub
+- Automatic container updates using Watchtower
+- Deployment on AWS EC2 with Docker Compose
+- Zero manual intervention after initial setup
 
 ---
 
-## 🏗️ Project Architecture
+## 🧱 Architecture
 
 
-Developer
-|
-| (git push)
-v
-GitHub Repository
-|
-| (Webhook Trigger)
-v
-Jenkins Pipeline
-|
-|-- Build Docker Image
-|-- Push Image to Docker Hub
-v
-AWS EC2 Instance
-|
-|-- Pull Docker Image
-|-- Run Container (Nginx)
-v
-User accesses application via Public IP
+GitHub (Code Push)
+      |
+      v
+Jenkins (CI Pipeline)
+      |
+      v
+Docker Image Build & Push
+      |
+      v
+Docker Hub
+     |
+     v
+Watchtower (Auto Pull)
+      |
+      v
+Docker Compose (EC2)
+      |
+      v
+Browser (Port 80)
 
 
 ---
 
-## 📂 Repository Structure
+## 📁 Project Structure
 
 
 devops-automation-pipeline/
-├── app/
-│ └── index.html # Web application
+│
 ├── terraform/
 │ ├── main.tf
 │ ├── variables.tf
 │ └── outputs.tf
+│
 ├── ansible/
 │ ├── inventory.ini
 │ └── docker-setup.yml
-├── Dockerfile
+│
+├── docker/
+│ ├── Dockerfile
+│ └── docker-compose.yml
+│
+├── app/
+│ └── index.html
+│
 ├── Jenkinsfile
-├── docker-compose.yml
 └── README.md
 
 
 ---
 
-## 🚀 Implementation Steps
+## ⚙️ Technologies Used
 
-### 1️⃣ Infrastructure Provisioning (Terraform)
-- EC2 instance created
-- Security Group configured (Ports: 22, 80, 8080)
-- Docker installed using `user_data`
+- **AWS EC2**
+- **Terraform**
+- **Ansible**
+- **Docker**
+- **Docker Compose**
+- **Watchtower**
+- **Jenkins**
+- **GitHub Webhooks**
+- **Nginx**
 
-```bash
-terraform init
-terraform apply
-2️⃣ Configuration Management (Ansible)
+---
 
-Installed Docker on EC2
+## 🚀 CI/CD Workflow
 
-Pulled Docker image
+1. Developer pushes code to the `main` branch on GitHub
+2. GitHub Webhook triggers Jenkins automatically
+3. Jenkins:
+   - Pulls the code
+   - Builds Docker image
+   - Pushes image to Docker Hub
+4. Watchtower detects new image
+5. Docker Compose restarts the container automatically
+6. Updated application is live on EC2 (Port 80)
 
-Verified connectivity using Ansible ping
+---
 
-ansible -i inventory.ini ec2 -m ping
-3️⃣ Containerization (Docker)
+## 🖥️ Deployment Details
 
-Nginx used as base image
+- Application runs inside a Docker container using **Nginx**
+- Container is managed by **Docker Compose**
+- **Restart policy enabled** to auto-start after reboot
+- **Elastic IP** used to avoid webhook failures after EC2 restart
 
-Application files copied to /usr/share/nginx/html
+---
 
-Image built using Dockerfile
+## 🔁 EC2 Stop / Start Behavior
 
-FROM nginx:latest
-COPY app/ /usr/share/nginx/html/
-4️⃣ CI Pipeline (Jenkins)
+| Action | Result |
+|------|------|
+| EC2 Reboot | Containers auto-start |
+| EC2 Stop | Containers stop |
+| EC2 Start | Containers auto-start via Docker Compose |
+| GitHub Push | Auto rebuild & redeploy |
 
-Jenkins installed on EC2
+> Docker containers are configured with restart policies (`restart: always`) to ensure high availability.
 
-Jenkinsfile configured for:
+---
 
-Code checkout
+## 🔐 Security Group Configuration
 
-Docker image build
+Inbound rules:
+- **Port 22** – SSH
+- **Port 80** – HTTP
+- **Port 8080** – Jenkins
 
-Docker Hub login
+---
 
-Docker image push
+## 📦 Docker Compose Configuration
 
-docker build -t sahilghidode/devops-automation-pipeline:latest .
-docker push sahilghidode/devops-automation-pipeline:latest
-5️⃣ GitHub Webhook Integration
+```yaml
+version: "3.8"
 
-Webhook configured in GitHub
+services:
+  app:
+    image: sahilghidode/devops-automation-pipeline:latest
+    container_name: devops-app
+    ports:
+      - "80:80"
+    restart: always
 
-Every push to main branch automatically triggers Jenkins build
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300
+    restart: always
+🧠 Key Learnings
 
-6️⃣ Deployment on EC2
+Infrastructure as Code using Terraform
 
-Docker image pulled from Docker Hub
+Automated configuration using Ansible
 
-Container run on port 80
+CI/CD automation with Jenkins
 
-docker pull sahilghidode/devops-automation-pipeline:latest
-docker run -d --name devops-app -p 80:80 sahilghidode/devops-automation-pipeline:latest
-🌐 Access the Application
-http://<EC2_PUBLIC_IP>
-🔄 Automation Behavior
-What is Automatic?
+Docker image lifecycle management
 
-GitHub push triggers Jenkins automatically
+Zero-downtime deployment using Watchtower
 
-Docker image rebuilds automatically
+Handling EC2 restart and IP changes using Elastic IP
 
-Image is pushed to Docker Hub automatically
+🧪 How to Access the Application
+http://<ELASTIC-IP>
+🏁 Conclusion
 
-What is Manual?
-
-Deployment (container restart) is manual
-
-This project currently follows:
-
-CI (Continuous Integration) + Manual Deployment
-
-🛑 What Happens If EC2 is STOPPED?
-
-When the EC2 instance is stopped:
-
-Server shuts down
-
-Docker containers stop
-
-Jenkins stops
-
-Website becomes unavailable
-
-▶️ Steps After EC2 STOP → START
-1️⃣ Start EC2 instance (AWS Console)
-
-Note new public IP (IP may change)
- cp /mnt/c/Users/HP/Documents/devops-automation-pipeline.pem ~/.ssh/
- chmod 400 ~/.ssh/devops-automation-pipeline.pem
-  ssh -i ~/.ssh/devops-automation-pipeline.pem ubuntu@13.233.214.47
-2️⃣ SSH into EC2
-ssh -i devops-automation-pipeline.pem ubuntu@<NEW_PUBLIC_IP>
-3️⃣ Start Docker service (if not running)
-sudo systemctl start docker
-4️⃣ Start application container
-docker start devops-app
-5️⃣ Start Jenkins
-sudo systemctl start jenkins
-6️⃣ Verify Application
-http://<NEW_PUBLIC_IP>
-🧠 Interview Explanation
-
-“This project implements an end-to-end DevOps automation pipeline using Terraform, Ansible, Docker, Jenkins, and GitHub. Jenkins handles CI automatically, while deployment is triggered manually on the EC2 instance.”
-
-🔮 Future Enhancements
-
-Fully automated CD using Jenkins SSH deploy
-
-Watchtower for auto container updates
-
-Elastic IP for static public IP
-
-HTTPS with SSL (Nginx + Certbot)
-
-Monitoring using Prometheus & Grafana
-
-✅ Project Status
-
-✔ Infrastructure as Code
-✔ CI Pipeline with Jenkins
-✔ GitHub Webhook Integration
-✔ Dockerized Deployment on AWS
-✔ Production-ready DevOps workflow
+This project demonstrates a production-style DevOps automation pipeline where infrastructure provisioning, application build, deployment, and updates are fully automated with minimal manual intervention.
 
 👨‍💻 Author
 
-by Sahil Ghidode
-DevOps | Cloud | Automation
+Sahil Ghidode
+DevOps & Cloud Enthusiast 🚀
