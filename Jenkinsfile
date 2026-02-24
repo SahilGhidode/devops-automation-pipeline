@@ -16,10 +16,15 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
-            }
-        }
+    steps {
+        sh '''
+          pwd
+          ls -l
+          ls -l app
+          docker build --no-cache -t sahilghidode/devops-automation-pipeline:latest .
+        '''
+    }
+}
 
         stage('Docker Login') {
             steps {
